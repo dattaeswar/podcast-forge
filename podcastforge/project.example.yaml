@@ -1,0 +1,148 @@
+# podcast-forge project file.  Everything is optional except `cameras` and `speakers`.
+# Relative paths are relative to this file. Run `pf doctor`, then `pf run`.
+
+name: My Podcast Ep 01          # used in the output file name
+resolution: [1920, 1080]
+fps: 30
+speed: 1.0                      # 1.1 = 10 % faster, pitch preserved (rubberband)
+
+# ---------------------------------------------------------------- cameras
+# One camera is the timeline `master` (default: the first). Others are aligned to it by audio, so every camera
+# needs a scratch audio track and must hear the same room. The camera whose audio is best (wireless mics) is
+# chosen below under audio.source.
+cameras:
+  - name: wide
+    file: footage/camera_a.mp4
+    master: true
+    sharpen: 0.4                # unsharp amount applied after scaling
+  - name: side
+    file: footage/camera_b.mov
+    sharpen: 0.55
+    # sync: {offset: -6.168}    # only if automatic sync fails: t_this = t_master + offset
+
+audio:
+  source: side                  # camera whose audio carries the mics (default: master)
+  loudness: -14                 # LUFS (YouTube / Spotify)
+  clean: true                   # highpass, denoise, de-ess, compress, limit
+
+# ---------------------------------------------------------------- the two people
+# side = which side of the frame they sit on (L or R). If seating differs per camera use `positions`.
+speakers:
+  - id: host
+    name: Alex Rivera
+    role: Host
+    side: R
+    # seed: [[12, 22]]          # seconds where ONLY the host talks (>= 5 s). Strongly recommended.
+  - id: guest
+    name: Sam Carter
+    role: Founder, Example Co.
+    side: L
+    # positions: {side: R}      # e.g. sits on the other side in camera `side`
+
+# ---------------------------------------------------------------- framing
+# Run `pf heads` to detect faces automatically, or `pf sheet` and fill in head centres by hand:
+#   framing.heads.<camera>.<speaker>: [[camera_time_s, x, y], ...]   (x, y normalised 0..1; a single [x, y] is fine)
+framing:
+  wide: 0.94                    # crop height as a fraction of the source height
+  close: 0.62
+  tight: 0.50                   # punch-in
+  setup_breaks: []              # master times where people re-sat / the camera moved, e.g. [1650]
+  heads: {}
+
+# ---------------------------------------------------------------- how aggressive is the cut?
+edit:
+  long_pause: 0.60              # silences longer than this are tightened to it
+  drop_fillers: true            # drop isolated aa / mm / breaths
+  min_shot: 2.5
+  max_shot: 7.5
+  reaction_after: 18            # cut to the listener after this many seconds of one speaker
+  start: null                   # master seconds where the episode body starts (skip pre-roll chatter)
+  end: null
+  cuts: []                      # [[start, end], ...] master seconds to remove, e.g. a phone call
+
+grade:
+  preset: studio_warm           # studio_warm | neutral | cinematic | punchy | none
+  # reference: wide             # camera the others are matched to (default: highest resolution)
+  # lut: {wide: my_look.cube}   # use your own LUT instead
+
+style:
+  accent: [255, 153, 0]
+  accent2: [255, 210, 64]
+  fonts: {display: impact.ttf, title: bahnschrift.ttf, body: segoeuib.ttf}   # names searched in system fonts and ./fonts
+
+logo:
+  file: null                    # transparent PNG, shown bottom-right the whole video
+  size: 170
+
+# ---------------------------------------------------------------- photos & text that appear while topics are discussed
+# `when.keywords` is a regex on the transcript (needs `pf transcribe`); `when.at` is a master time in seconds.
+overlays:
+  - id: guest_company
+    kind: circle                # circle | stat | kinetic
+    image: photos/company.jpg
+    focus: [0.5, 0.4]           # where the faces are (fractions) so the crop never misses them
+    fit: 1.0                    # >1 shows more of the photo on a blurred background
+    caption: "Example Co. HQ"
+    dur: 4.5
+    when: {keywords: "headquarters|our office", occurrence: first}
+  - id: revenue
+    kind: stat
+    count: [3.5, 1, "₹", " Cr"]     # [value, decimals, prefix, suffix]
+    sub: "First-year revenue"
+    when: {keywords: "revenue", occurrence: 2}
+  - id: big_idea
+    kind: kinetic
+    text: "NEVER STOP BUILDING"
+    highlight: [BUILDING]
+    dur: 3
+    when: {at: 600}
+
+chapters:                       # also written to out/youtube_chapters.txt
+  - {title: "Introduction", at: 0}
+  - {title: "The early days", when: {keywords: "early days"}}
+
+music:                          # your own licensed tracks; music ducks under the voice
+  bed: {file: music/intro.mp3, gain: -15, length: 15}
+  outro: {file: music/outro.mp3, gain: -14, length: 16}
+  cues:
+    - {file: music/cue.mp3, at: "chapter:2", length: 14, gain: -17}
+sfx:
+  photo_click: null             # e.g. sfx/camera_click.mp3 (played when a photo circle pops in)
+
+# ---------------------------------------------------------------- optional title card, trailer, reels, thumbnails
+title:
+  line1: "PRESENTS"
+  line2: "My Podcast"
+  dur: 3
+  # credit_image: work/credit.png   # make one with: pf text "..." credit.png --font "Nirmala UI"
+
+trailer:
+  hooks: []
+  # - id: h1
+  #   raw: [812.0, 826.5]          # master seconds of a strong moment (use `pf search`)
+  #   overlays: [{id: revenue, at: 815}]
+  #   music: {file: music/trailer.mp3, gain: -9}
+  #   punch: true
+
+reels:
+  cta: "FULL PODCAST ON YOUTUBE"
+  items: []
+  # - {name: Reel_1, line1: "THE HOOK", line2: "IN TWO LINES", hooks: [h1]}
+
+thumbnails: null
+# thumbnails:
+#   out: thumbnails
+#   credit_image: work/credit.png
+#   cutouts:                      # people cut out of a video frame (pip install "podcast-forge[thumbs]")
+#     host:  {camera: wide, time: 300, crop: [0.5, 0.0, 1.0, 0.8], bottom: 0.66}
+#     guest: {camera: wide, time: 300, crop: [0.0, 0.0, 0.5, 0.8]}
+#   youtube:
+#     - name: Thumb_A
+#       background: photos/company.jpg
+#       headline:
+#         - {text: "BIG CLAIM HERE", size: 118, color: white}
+#         - {text: "SECOND LINE...", size: 92, color: accent2}
+#       banner: "GUEST NAME · TOPIC"
+#       circles: [guest_company]
+#   reels:
+#     - {name: Reel_1_Cover, lines: ["BIG", "CLAIM"], sub: "SUBLINE", circle: guest_company}

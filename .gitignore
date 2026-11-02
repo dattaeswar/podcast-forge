@@ -1,0 +1,19 @@
+__pycache__/
+*.pyc
+*.egg-info/
+build/
+dist/
+.venv/
+.pytest_cache/
+# project data never belongs in the repo
+work/
+out/
+footage/
+*.mp4
+*.mov
+*.mkv
+*.wav
+*.mp3
+*.cube
+project.yaml
+!examples/project.example.yaml

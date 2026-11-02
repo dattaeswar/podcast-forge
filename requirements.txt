@@ -1,0 +1,10 @@
+numpy>=1.26
+scipy>=1.11
+soundfile>=0.12
+librosa>=0.10
+scikit-learn>=1.3
+opencv-python>=4.8
+pillow>=10.1
+pyyaml>=6
+# optional: faster-whisper>=1.0   (pf transcribe)
+# optional: rembg>=2.0 onnxruntime>=1.16   (pf thumbs)
