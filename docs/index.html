@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>podcast-forge: edit multi-camera podcasts with one command</title>
+<meta name="description" content="Open-source tool that syncs cameras, cuts dead air, switches angles, grades colour, masters audio and exports episode, trailer, 9:16 reels and thumbnails from one YAML file.">
+<meta property="og:title" content="podcast-forge: edit multi-camera podcasts with one command">
+<meta property="og:description" content="Raw footage in, finished episode, trailer, reels and thumbnails out. Free and open source.">
+<meta property="og:image" content="https://dattaeswar.github.io/podcast-forge/assets/promo-poster.jpg">
+<link rel="icon" href="assets/logo.png">
+<style>
+:root{--bg:#0b0a0e;--panel:#14121a;--line:#2a2633;--text:#f3f1f6;--mute:#a7a3b3;--acc:#ff9900;--acc2:#ffd240}
+*{box-sizing:border-box}html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--text);font:17px/1.6 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+a{color:var(--acc2);text-decoration:none}a:hover{text-decoration:underline}
+.wrap{max-width:1120px;margin:0 auto;padding:0 20px}
+nav{position:sticky;top:0;z-index:5;background:rgba(11,10,14,.85);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+nav .wrap{display:flex;align-items:center;gap:22px;height:60px}
+nav b{display:flex;align-items:center;gap:10px;font-size:18px}nav img{width:30px;height:30px}
+nav .sp{flex:1}nav a.l{color:var(--mute);font-size:15px}nav a.l:hover{color:var(--text);text-decoration:none}
+.btn{display:inline-block;background:var(--acc);color:#141414;font-weight:700;padding:11px 20px;border-radius:999px;border:0;cursor:pointer;font-size:16px}
+.btn:hover{background:var(--acc2);text-decoration:none}.btn.o{background:transparent;color:var(--text);border:1.5px solid var(--line)}
+.btn.o:hover{border-color:var(--acc);background:transparent}
+.hero{padding:64px 0 40px;background:radial-gradient(900px 500px at 78% 30%,rgba(255,153,0,.22),transparent 60%)}
+.hero .wrap{display:grid;grid-template-columns:1.15fr .85fr;gap:48px;align-items:center}
+h1{font-size:clamp(36px,5.2vw,62px);line-height:1.05;margin:0 0 18px;letter-spacing:-.02em}
+h1 em{font-style:normal;color:var(--acc2)}
+.lead{font-size:20px;color:var(--mute);max-width:560px}
+.cta{display:flex;gap:12px;flex-wrap:wrap;margin:26px 0}
+.code{position:relative;background:#09080c;border:1px solid var(--line);border-radius:14px;padding:16px 56px 16px 18px;font:15px/1.55 ui-monospace,"Cascadia Code",Consolas,monospace;overflow-x:auto;white-space:pre;color:#ffe9b0}
+.code .c{color:#7d7890}.copy{position:absolute;top:10px;right:10px;background:var(--panel);color:var(--mute);border:1px solid var(--line);border-radius:8px;padding:4px 10px;font-size:13px;cursor:pointer}
+.copy:hover{color:var(--text);border-color:var(--acc)}
+.phone{justify-self:center;width:min(320px,80vw);aspect-ratio:9/16;border-radius:34px;border:8px solid #1d1a25;overflow:hidden;box-shadow:0 30px 80px rgba(255,153,0,.2);background:#000}
+.phone video{width:100%;height:100%;object-fit:cover;display:block}
+.stats{display:flex;gap:28px;flex-wrap:wrap;color:var(--mute);font-size:15px;margin-top:6px}.stats b{color:var(--text)}
+section{padding:72px 0;border-top:1px solid var(--line)}
+h2{font-size:clamp(28px,3.6vw,40px);margin:0 0 10px;letter-spacing:-.01em}
+.sub{color:var(--mute);max-width:700px;margin:0 0 34px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(310px,1fr));gap:16px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:22px}
+.card:hover{border-color:rgba(255,153,0,.55)}
+.card h3{margin:0 0 6px;font-size:19px}.card p{margin:0;color:var(--mute);font-size:15.5px}
+.ic{width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,var(--acc),var(--acc2));color:#141414;display:grid;place-items:center;font-weight:800;margin-bottom:14px}
+.flow{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;counter-reset:s}
+.step{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px;font-size:14.5px;color:var(--mute);counter-increment:s}
+.step b{display:block;color:var(--text);font-size:16px;margin-bottom:2px}.step b:before{content:counter(s) ". ";color:var(--acc)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:26px}
+table{width:100%;border-collapse:collapse;font-size:15px}th,td{text-align:left;padding:12px 10px;border-bottom:1px solid var(--line);vertical-align:top}th{color:var(--acc2);font-weight:600}
+td code,.card code,li code,p code{background:#1b1823;padding:1px 6px;border-radius:6px;font-size:.92em;color:#ffe9b0}
+ul.ticks{list-style:none;padding:0;margin:0}ul.ticks li{padding:8px 0 8px 28px;position:relative;color:var(--mute)}ul.ticks li:before{content:"✓";position:absolute;left:0;color:var(--acc);font-weight:800}
+ul.ticks li b{color:var(--text)}
+.warn li:before{content:"!"}
+footer{padding:44px 0;border-top:1px solid var(--line);color:var(--mute);font-size:15px;text-align:center}
+@media(max-width:860px){.hero .wrap,.two{grid-template-columns:1fr}.phone{order:-1}nav a.l{display:none}}
+</style>
+</head>
+<body>
+<nav><div class="wrap">
+  <b><img src="assets/logo.png" alt="">podcast-forge</b><span class="sp"></span>
+  <a class="l" href="#features">Features</a><a class="l" href="#uses">Uses</a><a class="l" href="#agents">AI agents</a><a class="l" href="#start">Quick start</a>
+  <a class="btn" href="https://github.com/dattaeswar/podcast-forge">★ GitHub</a>
+</div></nav>
+
+<header class="hero"><div class="wrap">
+  <div>
+    <h1>Raw footage in.<br><em>Finished podcast</em> out.</h1>
+    <p class="lead">podcast-forge syncs your cameras, cuts dead air and fillers, switches angles like a human editor, matches colour, masters the audio and exports the episode, a trailer, vertical reels and thumbnails. From one YAML file. Free and open source.</p>
+    <div class="cta"><a class="btn" href="#start">Get started</a><a class="btn o" href="https://github.com/dattaeswar/podcast-forge">View on GitHub</a></div>
+    <div class="code"><span class="c"># needs Python 3.10+ and FFmpeg</span>
+pip install "git+https://github.com/dattaeswar/podcast-forge"
+pf init my-episode &amp;&amp; cd my-episode
+pf run<button class="copy" data-t='pip install "git+https://github.com/dattaeswar/podcast-forge"&#10;pf init my-episode && cd my-episode&#10;pf run'>Copy</button></div>
+    <div class="stats"><span><b>MIT</b> licence</span><span><b>2+</b> cameras</span><span><b>−14 LUFS</b> mastering</span><span><b>9:16</b> reels built in</span></div>
+  </div>
+  <div class="phone"><video src="assets/promo.mp4" poster="assets/promo-poster.jpg" autoplay muted loop playsinline controls></video></div>
+</div></header>
+
+<section id="features"><div class="wrap">
+  <h2>What it does</h2>
+  <p class="sub">Every step is automatic, tunable, and re-runnable. Change one shot and only that shot re-renders.</p>
+  <div class="grid">
+    <div class="card"><div class="ic">1</div><h3>Auto multicam switching</h3><p>Wide, close-up and tight punch-in per camera. Never the same look twice in a row, so every jump cut is hidden. Listener reaction shots after long answers, J-cuts, slow push-ins.</p></div>
+    <div class="card"><div class="ic">2</div><h3>Tight pacing</h3><p>Long pauses shortened, isolated "aa / mm" and false starts removed, optional 1.1× speed-up with the pitch preserved.</p></div>
+    <div class="card"><div class="ic">3</div><h3>Voice-first audio</h3><p>Uses the camera that heard your mics. High-pass, denoise, de-ess, compress, limit, then two-pass loudness to −14 LUFS. Music ducks under speech.</p></div>
+    <div class="card"><div class="ic">4</div><h3>One look across cameras</h3><p>Cameras matched to a reference, then a shared grade (<code>studio_warm</code>, <code>cinematic</code>, <code>punchy</code>…) or your own <code>.cube</code> LUT.</p></div>
+    <div class="card"><div class="ic">5</div><h3>Photos when topics are spoken</h3><p>A photo appears in an animated circle at the moment it is mentioned (matched on the transcript), and the shot underneath is reframed so the circle never covers a face.</p></div>
+    <div class="card"><div class="ic">6</div><h3>Stats, text, tags</h3><p>Count-up stat cards, kinetic text, name lower-thirds and chapter tags, all animated and cached.</p></div>
+    <div class="card"><div class="ic">7</div><h3>Trailer + reels</h3><p>Pick hooks, get a cold-open trailer with a title card. The same hooks become 9:16 reels centred on whoever speaks, with title, call-to-action and logo above the app UI.</p></div>
+    <div class="card"><div class="ic">8</div><h3>Thumbnails</h3><p>YouTube and reel covers with both people cut out, headline in a safe zone, topic photos, banner, logo and credit line.</p></div>
+    <div class="card"><div class="ic">9</div><h3>Any language</h3><p>Transcribe in any Whisper language. <code>pf text</code> renders Telugu, Hindi, Tamil, Arabic and more with correct shaping for titles and credits.</p></div>
+  </div>
+</div></section>
+
+<section id="how"><div class="wrap">
+  <h2>How a run works</h2>
+  <p class="sub">Each stage reads and writes files in <code>work/</code>, so you can inspect, fix and re-run any step.</p>
+  <div class="flow">
+    <div class="step"><b>Sync</b>align cameras by audio, detect drift</div>
+    <div class="step"><b>Speech</b>find speech vs. silence</div>
+    <div class="step"><b>Speakers</b>voice model + on-camera motion</div>
+    <div class="step"><b>Transcript</b>word-level, any language</div>
+    <div class="step"><b>Grade</b>match cameras, build LUTs</div>
+    <div class="step"><b>Plan</b>cuts, shots, push-ins, XML</div>
+    <div class="step"><b>Render</b>overlays, music, −14 LUFS</div>
+    <div class="step"><b>Extras</b>trailer, reels, thumbnails</div>
+  </div>
+</div></section>
+
+<section id="uses"><div class="wrap">
+  <h2>What you can use it for</h2>
+  <p class="sub">Anyone who films a conversation with two people on one to three cameras.</p>
+  <div class="two">
+    <div>
+      <h3>Who it is for</h3>
+      <ul class="ticks">
+        <li><b>Podcasters and YouTube interview shows</b> who want a weekly episode out in one run instead of a day in the timeline.</li>
+        <li><b>Regional-language creators</b> (Telugu, Hindi, Tamil…) with code-switched speech and non-Latin titles.</li>
+        <li><b>Short-form clippers</b> who turn long interviews into 9:16 reels with hooks and titles.</li>
+        <li><b>Small studios and agencies</b> who need one consistent look across cameras and episodes.</li>
+        <li><b>Editors</b> who want a strong rough cut: export the multicam XML and finish in Premiere, Resolve or Final Cut.</li>
+      </ul>
+    </div>
+    <div>
+      <h3>Typical jobs</h3>
+      <table>
+        <tr><th>You want</th><th>You run</th></tr>
+        <tr><td>A full episode, mastered</td><td><code>pf run</code></td></tr>
+        <tr><td>Find the moment someone said "funding"</td><td><code>pf search "funding"</code></td></tr>
+        <tr><td>A different colour look</td><td>set <code>grade.preset</code>, <code>pf grade</code></td></tr>
+        <tr><td>Remove a phone call</td><td><code>edit.cuts: [[620, 700]]</code></td></tr>
+        <tr><td>Shorts from the best moments</td><td>add <code>reels.items</code>, <code>pf reels</code></td></tr>
+        <tr><td>Fine-tune by hand</td><td>open <code>out/timeline_episode.xml</code></td></tr>
+        <tr><td>Telugu credit on a thumbnail</td><td><code>pf text "…" credit.png</code></td></tr>
+      </table>
+    </div>
+  </div>
+</div></section>
+
+<section id="agents"><div class="wrap">
+  <h2>Let an AI agent run it</h2>
+  <p class="sub">Give your coding agent the instruction file and say "edit the podcast in ./footage". It writes the config, picks hooks from the transcript, checks frames and iterates on your notes.</p>
+  <div class="grid">
+    <div class="card"><h3>Claude Code</h3><p><code>python scripts/install_skill.py</code> installs the skill. Then ask it to edit your podcast.</p></div>
+    <div class="card"><h3>OpenAI Codex CLI</h3><p><code>python scripts/install_agent_files.py --dest my-episode</code>, then run <code>codex</code> in that folder. It reads <code>AGENTS.md</code>.</p></div>
+    <div class="card"><h3>Gemini CLI</h3><p>Same command copies <code>GEMINI.md</code>, which imports <code>AGENTS.md</code>. Run <code>gemini</code> in the folder.</p></div>
+    <div class="card"><h3>Cursor, Aider, Grok, others</h3><p>Most read <code>AGENTS.md</code>. If yours does not: "Read AGENTS.md and follow it". Aider: <code>aider --read AGENTS.md</code>.</p></div>
+  </div>
+</div></section>
+
+<section id="start"><div class="wrap">
+  <h2>Quick start</h2>
+  <p class="sub">The minimum is two cameras and two speakers. Everything else is optional.</p>
+  <div class="two">
+    <div class="code"><span class="c"># project.yaml</span>
+cameras:
+  - {name: wide, file: footage/a.mp4, master: true}
+  - {name: side, file: footage/b.mov}
+audio: {source: side}        <span class="c"># camera with the mics</span>
+speakers:
+  - {id: host,  name: Alex Rivera, side: R,
+     seed: [[12, 22]]}       <span class="c"># host talks alone here</span>
+  - {id: guest, name: Sam Carter,  side: L}
+speed: 1.1</div>
+    <div>
+      <ul class="ticks">
+        <li><code>pf doctor</code> checks FFmpeg and Python packages.</li>
+        <li><code>pf heads</code> finds both faces automatically, or <code>pf sheet</code> to read positions by eye.</li>
+        <li><code>pf run</code> goes from footage to <code>out/*_Master.mp4</code>, chapters, reels and thumbnails.</li>
+        <li>Add photos, music, trailer hooks and thumbnails when you want them. See the <a href="https://github.com/dattaeswar/podcast-forge/blob/main/examples/project.example.yaml">annotated example</a>.</li>
+      </ul>
+      <p><a class="btn" href="https://github.com/dattaeswar/podcast-forge#quick-start">Full guide on GitHub</a></p>
+    </div>
+  </div>
+</div></section>
+
+<section id="limits"><div class="wrap">
+  <h2>Honest limits</h2>
+  <ul class="ticks warn">
+    <li><b>Two speakers, front-facing cameras.</b> Panels of three or more are not supported yet.</li>
+    <li><b>Speaker labelling is heuristic.</b> Good with seeds and a clean mic mix; weaker on cross-talk. Overrides are built in.</li>
+    <li><b>Speed:</b> it runs on a CPU. A 40-minute episode can take an hour or more, and transcription alone runs near real time.</li>
+    <li><b>Rights:</b> no music, fonts or footage ship with the tool. Use music you are licensed to use; film BGMs can trigger Content ID.</li>
+    <li>Developed and tested on Windows 11; the unit tests also pass on Linux CI. macOS has had less testing.</li>
+  </ul>
+</div></section>
+
+<footer><div class="wrap">
+  MIT licence · Built by <a href="https://github.com/dattaeswar">Datta Eswar Tangeti</a> (Datta Talks) ·
+  <a href="https://github.com/dattaeswar/podcast-forge">GitHub</a> · <a href="https://github.com/dattaeswar/podcast-forge/blob/main/docs/HOW_IT_WORKS.md">How it works</a> ·
+  <a href="https://github.com/dattaeswar/podcast-forge/blob/main/docs/TROUBLESHOOTING.md">Troubleshooting</a>
+</div></footer>
+<script>
+document.querySelectorAll(".copy").forEach(b=>b.addEventListener("click",async()=>{try{await navigator.clipboard.writeText(b.dataset.t);b.textContent="Copied";setTimeout(()=>b.textContent="Copy",1500)}catch(e){}}));
+</script>
+</body>
+</html>

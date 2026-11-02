@@ -18,3 +18,4 @@ footage/
 project.yaml
 !examples/project.example.yaml
 .claude-flow/
+!docs/assets/*.mp4

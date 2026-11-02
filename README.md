@@ -14,6 +14,8 @@ raw cameras ──► sync ──► speech + speakers ──► tighten cuts �
                                                                                                    └─► thumbnails
 ```
 
+**Website: [dattaeswar.github.io/podcast-forge](https://dattaeswar.github.io/podcast-forge/)** (features, uses, 20-second demo video)
+
 ## What you get
 
 | | |
