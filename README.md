@@ -37,9 +37,9 @@ Requirements: Python 3.10+, **FFmpeg (full build, with `rubberband`)** on your P
 ```bash
 git clone https://github.com/dattaeswar/podcast-forge
 cd podcast-forge
-pip install -e .                        # core
-pip install -e ".[transcribe]"          # + faster-whisper (word timestamps for photo placement)
-pip install -e ".[thumbs]"              # + rembg (cut people out for thumbnails)
+pip install .                           # core (or: pip install "git+https://github.com/dattaeswar/podcast-forge")
+pip install ".[transcribe]"             # + faster-whisper (word timestamps for photo placement)
+pip install ".[thumbs]"                 # + rembg (cut people out for thumbnails)
 pf doctor                               # checks everything
 ```
 
@@ -95,13 +95,28 @@ Everything else (photos on topics, chapters, music, trailer hooks, reels, thumbn
 3. **`edit.start` / `edit.cuts`**: skip pre-roll chatter and remove phone calls or retakes by master-time ranges.
 4. **`overlays[].focus`**: tells the circle crop where the faces are in each photo so it never misses them.
 
-## Working with an AI assistant
+## Use it with an AI agent
 
-The repo ships a [Claude Code skill](skills/podcast-forge/SKILL.md). Install it once and an assistant can run the whole workflow for you: write the config from your footage, pick hooks by reading the transcript, check frames, fix framing, and iterate on notes like "the circle covers his face".
+You can let an AI coding agent run the whole workflow: it writes `project.yaml` from your footage, picks trailer hooks by reading the transcript, looks at frames, and iterates on notes like "the circle covers his face". Any agent that can run shell commands works. Install the tool once, then give the agent the instructions in this repo.
 
 ```bash
-python scripts/install_skill.py         # copies the skill to ~/.claude/skills/podcast-forge
+pip install "git+https://github.com/dattaeswar/podcast-forge"          # the `pf` command (needs FFmpeg on PATH)
+pip install "podcast-forge[transcribe,thumbs] @ git+https://github.com/dattaeswar/podcast-forge"   # with optional extras
+git clone https://github.com/dattaeswar/podcast-forge                   # to get the agent instruction files
 ```
+
+| Agent | Install | Then |
+|---|---|---|
+| **Claude Code** | `python scripts/install_skill.py` (installs the skill to `~/.claude/skills/podcast-forge`) | Open Claude Code in your episode folder: *"Edit this podcast with the podcast-forge skill: footage is in ./footage"* |
+| **OpenAI Codex CLI** | `python scripts/install_agent_files.py --dest my-episode` (copies `AGENTS.md`) | `cd my-episode && codex` and ask it to edit the podcast. Codex reads `AGENTS.md` from the working folder. |
+| **Gemini CLI** | same command as above (copies `GEMINI.md` + `AGENTS.md`) | `cd my-episode && gemini` and ask. Gemini CLI loads `GEMINI.md`, which imports `AGENTS.md`. |
+| **Cursor, Windsurf, Copilot agent, Aider, Grok and others** | same command as above | Most read `AGENTS.md` automatically. If yours does not, start with *"Read AGENTS.md and follow it to edit the podcast in ./footage"* (Aider: `aider --read AGENTS.md`). |
+
+Notes:
+- `AGENTS.md` is generated from [`skills/podcast-forge/SKILL.md`](skills/podcast-forge/SKILL.md) (`python scripts/install_agent_files.py --regenerate`). Edit the skill, not `AGENTS.md`.
+- Put your own standing preferences (look, pace, music rules) in a `house-style.md` next to the instruction file; the agent reads it first.
+- The agent needs shell access and permission to run `ffmpeg` / `pf`; long renders (a 40-minute episode can take an hour or more on a laptop CPU, transcription alone runs near real time) should run in the background.
+- Agent behaviour differs by product and changes over time: if one does not pick up the file, tell it to read `AGENTS.md` explicitly.
 
 ## Docs
 

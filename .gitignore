@@ -17,3 +17,4 @@ footage/
 *.cube
 project.yaml
 !examples/project.example.yaml
+.claude-flow/
