@@ -12,7 +12,7 @@ First read `house-style.md` next to this file if it exists: it holds this user's
 
 ## Workflow (do not skip the checks)
 1. **Intake**: list footage, `ffprobe` each file, confirm which camera has the wireless-mic audio, who sits on which side (L/R as seen in frame), any re-seating (`setup_breaks`), and what overlay photos / music / logo exist. Ask only what you cannot see.
-2. **`pf init`**, then write `project.yaml`. Use fictional-free, real values; copy the example file's structure.
+2. **`pf init`**, then write `project.yaml`. Use the real values from the footage; copy the structure of the example file.
 3. **`pf doctor`**: fix missing tools first.
 4. **`pf sync`**: expect "N/N confident points". A non-zero drift is real; zero is normal.
 5. **Heads**: `pf heads` (downloads a 230 KB face model once, say so first) else `pf sheet` and read the grid. **View the sheet / a few cropped frames**: wrong heads ruin every crop.
